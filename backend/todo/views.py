@@ -36,6 +36,3 @@ def delete_task(request, task_id):
     task.delete()
     return redirect('task_list')
 
-def total_tasks(request):
-    total = Task.objects.count()
-    return render(request, 'todo/total_tasks.html', {'total': total})
