@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from .models import Task
 
 def task_list(request):
-   
     if request.method == 'POST':
         task_title = request.POST.get('title')
         if task_title:
@@ -11,6 +10,32 @@ def task_list(request):
 
     
     tasks = Task.objects.all().order_by('-created_at')
+    
+    
+    total_tasks = Task.objects.count()
+    completed_tasks = Task.objects.filter(completed=True).count()
+    open_tasks = Task.objects.filter(completed=False).count()
 
-   
-    return render(request, 'todo/task_list.html', {'tasks': tasks})
+    context = {
+        'tasks': tasks,
+        'total_tasks': total_tasks,
+        'completed_tasks': completed_tasks,
+        'open_tasks': open_tasks,
+    }
+
+    return render(request, 'todo/task_list.html', context)
+
+def toggle_task(request, task_id):
+    task = Task.objects.get(id=task_id)
+    task.completed = not task.completed
+    task.save()
+    return redirect('task_list')
+
+def delete_task(request, task_id):
+    task = Task.objects.get(id=task_id)
+    task.delete()
+    return redirect('task_list')
+
+def total_tasks(request):
+    total = Task.objects.count()
+    return render(request, 'todo/total_tasks.html', {'total': total})
